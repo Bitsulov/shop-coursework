@@ -1,0 +1,10 @@
+logging:
+  level:
+    com.example.shop: ${LOG_LEVEL_APP:INFO}
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.jdbc.bind: ${LOG_LEVEL_SQL_BIND:INFO}
+    org.flywaydb: DEBUG
+    org.springdoc: DEBUG
+    io.swagger.v3: DEBUG
+    org.springframework.security: INFO
+    org.springframework.web: INFO

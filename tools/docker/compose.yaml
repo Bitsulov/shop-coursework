@@ -1,0 +1,62 @@
+name: shop
+
+services:
+  postgres:
+    image: postgres:18
+    container_name: shop_postgres
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  rabbitmq:
+    image: rabbitmq:4-management
+    container_name: shop_rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBIT_MQ_USERNAME}
+      RABBITMQ_DEFAULT_PASS: ${RABBIT_MQ_PASSWORD}
+      RABBITMQ_DEFAULT_VHOST: ${RABBIT_MQ_VHOST}
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  rustfs:
+    image: rustfs/rustfs:1.0.0
+    container_name: shop_rustfs
+    environment:
+      RUSTFS_ACCESS_KEY: ${S3_USERNAME}
+      RUSTFS_SECRET_KEY: ${S3_PASSWORD}
+      RUSTFS_ADDRESS: 0.0.0.0:9000
+      RUSTFS_CONSOLE_ADDRESS: 0.0.0.0:9001
+      RUSTFS_VOLUMES: /data/rustfs0
+    volumes:
+      - rustfs-data:/data
+
+  backend:
+    build:
+      context: ../../backend
+    container_name: shop_backend
+    env_file: ../../.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      rustfs:
+        condition: service_started
+
+volumes:
+  postgres-data:
+  rabbitmq-data:
+  rustfs-data:
