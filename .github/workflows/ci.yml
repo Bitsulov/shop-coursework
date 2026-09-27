@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 25
+
+      - uses: gradle/actions/setup-gradle@v6
+
+      - name: Create .env
+        run: |
+          cp .github/ci.env .env
+          cp .github/ci.env backend/.env
+
+      - name: Start infrastructure
+        working-directory: tools/docker
+        run: docker compose --env-file ../../.env up -d --wait postgres rabbitmq rustfs mailpit
+
+      - name: Build and test
+        working-directory: backend
+        env:
+          DB_HOST: localhost
+          RABBIT_MQ_HOST: localhost
+          MAIL_HOST: localhost
+          S3_ENDPOINT: http://localhost:9000
+        run: ./gradlew build
+
+      - name: Start backend
+        working-directory: tools/docker
+        run: docker compose --env-file ../../.env up -d --build backend
+
+      - name: Wait for backend
+        run: curl --silent --output /dev/null --retry 60 --retry-delay 2 --retry-all-errors http://localhost:8080/
+
+      - name: Show container logs
+        if: failure()
+        working-directory: tools/docker
+        run: docker compose --env-file ../../.env logs
