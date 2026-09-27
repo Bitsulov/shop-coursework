@@ -45,5 +45,8 @@ services:
       mailpit:
         condition: service_started
 
+  nginx:
+    container_name: shop_nginx_dev
+
 volumes:
   pgadmin-data:
