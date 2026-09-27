@@ -1,0 +1,12 @@
+app:
+  s3:
+    endpoint: ${S3_ENDPOINT}
+    public-url: ${S3_PUBLIC_URL}
+    access-key: ${S3_USERNAME}
+    secret-key: ${S3_PASSWORD}
+    bucket: ${S3_BUCKETNAME}
+
+  image:
+    max-pixels: 4000000
+    max-width: 512
+    max-height: 512
