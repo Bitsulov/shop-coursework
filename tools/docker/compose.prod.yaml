@@ -1,0 +1,12 @@
+services:
+  postgres:
+    restart: unless-stopped
+
+  rabbitmq:
+    restart: unless-stopped
+
+  rustfs:
+    restart: unless-stopped
+
+  backend:
+    restart: unless-stopped
