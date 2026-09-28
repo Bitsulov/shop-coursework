@@ -32,6 +32,15 @@ app:
   allow-new-code-time: 2m
   code-max-attempts: 5
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  health:
+    mail:
+      enabled: false
+
 server:
   port: ${SERVER_PORT:8080}
   address: 0.0.0.0
