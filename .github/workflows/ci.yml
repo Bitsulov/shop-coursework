@@ -40,12 +40,27 @@ jobs:
 
       - name: Start backend
         working-directory: tools/docker
-        run: docker compose --env-file ../../.env up -d --build backend
-
-      - name: Wait for backend
-        run: curl --silent --output /dev/null --retry 60 --retry-delay 2 --retry-all-errors http://localhost:8080/
+        run: docker compose --env-file ../../.env up -d --build --wait backend
 
       - name: Show container logs
         if: failure()
         working-directory: tools/docker
         run: docker compose --env-file ../../.env logs
+
+  prod:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Create .env
+        run: cp .github/ci.env .env
+
+      - name: Start production stack
+        working-directory: tools/docker
+        run: docker compose --env-file ../../.env -f compose.yaml -f compose.prod.yaml up -d --build --wait
+
+      - name: Show container logs
+        if: failure()
+        working-directory: tools/docker
+        run: docker compose --env-file ../../.env -f compose.yaml -f compose.prod.yaml logs
