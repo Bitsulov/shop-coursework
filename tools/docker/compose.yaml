@@ -10,8 +10,8 @@ services:
       - "80:80"
     depends_on:
       backend:
-        condition: service_started
-  
+        condition: service_healthy
+
   postgres:
     image: postgres:18
     container_name: shop_postgres
