@@ -46,6 +46,8 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-mail")
 	// Обмен сообщениями по протоколу AMQP (RabbitMQ)
 	implementation("org.springframework.boot:spring-boot-starter-amqp")
+	// Проверка состояния приложения
+	implementation("org.springframework.boot:spring-boot-starter-actuator")
 	// OpenAPI/Swagger UI
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.1.1")
 	// Генерация геттеров, сеттеров, конструкторов
