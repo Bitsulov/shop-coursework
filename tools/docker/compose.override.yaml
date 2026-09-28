@@ -1,3 +1,5 @@
+name: shop-dev
+
 services:
   postgres:
     container_name: shop_postgres_dev
@@ -44,6 +46,9 @@ services:
     depends_on:
       mailpit:
         condition: service_started
+
+  nginx:
+    container_name: shop_nginx_dev
 
 volumes:
   pgadmin-data:

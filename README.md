@@ -10,7 +10,7 @@ Shop — интернет-магазин электроники и бытово�
 
 *   `backend/` — REST API на Spring Boot.
 *   `frontend/` — веб-клиент.
-*   `tools/docker/` — сервисы: PostgreSQL, RabbitMQ, S3-хранилище RustFS, Mailpit, pgAdmin.
+*   `tools/docker/` — сервисы: Nginx, PostgreSQL, RabbitMQ, S3-хранилище RustFS, Mailpit, pgAdmin.
 *   `.env.example` — шаблон настроек для всех сервисов проекта.
 
 ---
@@ -56,7 +56,7 @@ docker compose --env-file ..\..\.env up -d
 docker compose --env-file ..\..\.env -f compose.yaml -f compose.prod.yaml up -d
 ```
 
-Наружу порты не открываются. Контейнеры автоматически перезапускаются после сбоя.
+Наружу открыт только порт `80` Nginx, через который проходят все запросы. Контейнеры автоматически перезапускаются после сбоя.
 
 ### Сервисы и порты
 
@@ -64,6 +64,7 @@ docker compose --env-file ..\..\.env -f compose.yaml -f compose.prod.yaml up -d
 
 | Сервис     | Порт            | Назначение                    |
 | ---------- | --------------- | ----------------------------- |
+| Nginx      | `80`            | Точка входа для всех запросов |
 | API        | `8080`          | REST API                      |
 | PostgreSQL | `5432`          | База данных                   |
 | RabbitMQ   | `5672`, `15672` | Брокер сообщений, веб-консоль |
