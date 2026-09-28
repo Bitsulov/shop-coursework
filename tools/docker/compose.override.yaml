@@ -1,3 +1,5 @@
+name: shop-dev
+
 services:
   postgres:
     container_name: shop_postgres_dev
