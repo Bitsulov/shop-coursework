@@ -231,6 +231,10 @@ public class AuthServiceImpl implements AuthService {
                     return new UnauthorizedException("Invalid refresh token");
                 });
 
+        if (user.getDeletedAt() != null) {
+            log.warn("Refresh failed: user is deleted, uuid={}", uuid);
+            throw new UnauthorizedException("Invalid refresh token");
+        }
         if (!user.isActive()) {
             log.warn("Refresh failed: user is not verified, uuid={}", uuid);
             throw new ForbiddenException("Email is not verified");
