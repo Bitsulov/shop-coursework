@@ -24,4 +24,8 @@ public interface AddressRepository extends JpaRepository<Address, Long> {
     @Modifying(flushAutomatically = true)
     @Query("UPDATE Address a SET a.selected = false WHERE a.user = :user AND a.selected = true AND a <> :target")
     int clearSelection(@Param("user") User user, @Param("target") Address target);
+
+    @Modifying
+    @Query("DELETE FROM Address a WHERE a.user = :user")
+    int deleteAllByUser(@Param("user") User user);
 }

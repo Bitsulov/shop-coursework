@@ -17,4 +17,8 @@ public interface VerificationCodeRepository extends JpaRepository<VerificationCo
     @Modifying
     @Query("UPDATE VerificationCode c SET c.attempts = c.attempts + 1 WHERE c.id = :id AND c.attempts < :maxAttempts")
     int incrementAttempts(@Param("id") Long id, @Param("maxAttempts") int maxAttempts);
+
+    @Modifying
+    @Query("DELETE FROM VerificationCode c WHERE c.user = :user")
+    int deleteAllByUser(@Param("user") User user);
 }
