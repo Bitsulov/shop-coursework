@@ -24,13 +24,13 @@ public class User extends BaseEntity {
     @Column(nullable = false, unique = true)
     private UUID uuid;
 
-    @Column(nullable = false, unique = true)
+    @Column(unique = true)
     private String email;
 
     @Column(nullable = false, length = 60)
     private String password;
 
-    @Column(nullable = false, length = 50)
+    @Column(length = 50)
     private String name;
 
     @Column(length = 20)
@@ -59,4 +59,6 @@ public class User extends BaseEntity {
 
     @Column(nullable = false)
     private Instant updatedAt;
+
+    private Instant deletedAt;
 }
