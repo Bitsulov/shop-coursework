@@ -474,6 +474,19 @@ class AuthServiceImplTest {
         }
 
         @Test
+        @DisplayName("Удалённому пользователю новые токены не выдаются, возвращается ошибка недействительного токена")
+        void userDeleted() {
+            User existing = user(false, false);
+            existing.setDeletedAt(Instant.now());
+            stubValidRefreshToken(existing.getUuid());
+            when(userRepository.findByUuid(existing.getUuid())).thenReturn(Optional.of(existing));
+
+            assertThatThrownBy(() -> authService.refresh(refreshRequest()))
+                    .isInstanceOf(UnauthorizedException.class)
+                    .hasMessage("Invalid refresh token");
+        }
+
+        @Test
         @DisplayName("Пользователь с неподтверждённой почтой не получает новые токены")
         void notVerified() {
             User existing = user(false, false);

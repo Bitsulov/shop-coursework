@@ -6,7 +6,10 @@ import com.example.shop.dtos.auth.SendCodeRequest;
 import com.example.shop.dtos.auth.SignInRequest;
 import com.example.shop.dtos.auth.SignUpRequest;
 import com.example.shop.dtos.auth.VerifyRequest;
+import com.example.shop.dtos.user.UserDetailResponse;
+import com.example.shop.security.UserPrincipal;
 import com.example.shop.services.AuthService;
+import com.example.shop.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -15,6 +18,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,6 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final AuthService authService;
+    private final UserService userService;
 
     @Operation(
             summary = "Регистрация нового пользователя",
@@ -125,6 +131,24 @@ public class AuthController {
             @Valid @RequestBody RefreshRequest request
     ) {
         AuthResponse response = authService.refresh(request);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @Operation(
+            summary = "Текущий пользователь",
+            description = "Возвращает полные данные текущего авторизованного пользователя.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Данные пользователя получены"),
+                    @ApiResponse(responseCode = "401", description = "Требуется аутентификация"),
+                    @ApiResponse(responseCode = "404", description = "Пользователь не найден"),
+                    @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
+            }
+    )
+    @GetMapping("/user")
+    public ResponseEntity<UserDetailResponse> getUser(
+            @Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal principal
+    ) {
+        UserDetailResponse response = userService.getDetails(principal);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
