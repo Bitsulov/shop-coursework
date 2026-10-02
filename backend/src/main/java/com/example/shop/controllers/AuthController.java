@@ -136,7 +136,7 @@ public class AuthController {
 
     @Operation(
             summary = "Текущий пользователь",
-            description = "Возвращает полные текущего авторизованного пользователя.",
+            description = "Возвращает полные данные текущего авторизованного пользователя.",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Данные пользователя получены"),
                     @ApiResponse(responseCode = "401", description = "Требуется аутентификация"),
