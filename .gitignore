@@ -10,5 +10,17 @@ out/
 ### VS Code ###
 .vscode/
 
+### Visual Studio ###
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+### Vim ###
+*.sw?
+
+### macOS ###
+.DS_Store
+
 ### Environment ###
 .env

@@ -47,6 +47,11 @@ services:
       mailpit:
         condition: service_started
 
+  frontend:
+    container_name: shop_frontend_dev
+    ports:
+      - "3000:3000"
+
   nginx:
     container_name: shop_nginx_dev
 
