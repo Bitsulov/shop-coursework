@@ -20,6 +20,12 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v6
 
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
       - name: Create .env
         run: |
           cp .github/ci.env .env
@@ -29,7 +35,7 @@ jobs:
         working-directory: tools/docker
         run: docker compose --env-file ../../.env up -d --wait postgres rabbitmq rustfs mailpit
 
-      - name: Build and test
+      - name: Build and test backend
         working-directory: backend
         env:
           DB_HOST: localhost
@@ -38,9 +44,19 @@ jobs:
           S3_ENDPOINT: http://localhost:9000
         run: ./gradlew build
 
-      - name: Start backend
+      - name: Build and test frontend
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run lint
+          npm run lint:style
+          npm run format:check
+          npm run test:coverage
+          npm run build
+
+      - name: Start application
         working-directory: tools/docker
-        run: docker compose --env-file ../../.env up -d --build --wait backend
+        run: docker compose --env-file ../../.env up -d --build --wait backend frontend nginx
 
       - name: Show container logs
         if: failure()
