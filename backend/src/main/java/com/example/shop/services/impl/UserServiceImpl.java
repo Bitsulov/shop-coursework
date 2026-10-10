@@ -76,11 +76,15 @@ public class UserServiceImpl implements UserService {
             throw new IllegalArgumentException("Cannot upload and delete avatar at the same time");
         }
 
-        User user = userRepository.findByUuid(uuid)
+        User user = userRepository.findLockedByUuid(uuid)
                 .orElseThrow(() -> {
                     log.warn("Profile update failed: user not found, uuid={}", uuid);
                     return new ResourceNotFoundException("User not found");
                 });
+        if (!user.isActive()) {
+            log.warn("Profile update failed: user is deleted or not verified, uuid={}", uuid);
+            throw new ResourceNotFoundException("User not found");
+        }
         String oldAvatarUrl = user.getAvatarUrl();
 
         userMapper.updateEntity(details, user);
@@ -110,7 +114,7 @@ public class UserServiceImpl implements UserService {
     public void delete(UserPrincipal principal, DeleteAccountRequest request) {
         UUID uuid = principal.getUuid();
 
-        User user = userRepository.findByUuid(uuid)
+        User user = userRepository.findLockedByUuid(uuid)
                 .orElseThrow(() -> {
                     log.warn("Account deletion failed: user not found, uuid={}", uuid);
                     return new ResourceNotFoundException("User not found");
