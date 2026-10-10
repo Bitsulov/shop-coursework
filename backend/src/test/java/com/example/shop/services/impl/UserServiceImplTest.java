@@ -145,11 +145,25 @@ class UserServiceImplTest {
         }
 
         @Test
+        @DisplayName("Для удалённого пользователя возвращается ошибка «не найден», профиль в базе данных не изменяется")
+        void inactiveUser() {
+            User user = user(OLD_AVATAR);
+            user.setActive(false);
+            when(userRepository.findLockedByUuid(user.getUuid())).thenReturn(Optional.of(user));
+
+            assertThatThrownBy(() -> userService.updateDetails(new UserPrincipal(user), details(false), avatarFile()))
+                    .isInstanceOf(ResourceNotFoundException.class)
+                    .hasMessage("User not found");
+            verify(userRepository, never()).saveAndFlush(any());
+            verifyNoInteractions(imageUploaderService);
+        }
+
+        @Test
         @DisplayName("Имя и телефон сохраняются в базе данных без обращения к хранилищу файлов")
         void onlyFields() {
             User user = user(OLD_AVATAR);
             UserUpdateDetails details = details(false);
-            when(userRepository.findByUuid(user.getUuid())).thenReturn(Optional.of(user));
+            when(userRepository.findLockedByUuid(user.getUuid())).thenReturn(Optional.of(user));
 
             userService.updateDetails(new UserPrincipal(user), details, null);
 
@@ -165,7 +179,7 @@ class UserServiceImplTest {
         void newAvatar() {
             User user = user(OLD_AVATAR);
             MockMultipartFile avatar = avatarFile();
-            when(userRepository.findByUuid(user.getUuid())).thenReturn(Optional.of(user));
+            when(userRepository.findLockedByUuid(user.getUuid())).thenReturn(Optional.of(user));
             when(imageUploaderService.uploadImage(avatar)).thenReturn(NEW_AVATAR);
 
             userService.updateDetails(new UserPrincipal(user), details(false), avatar);
@@ -182,7 +196,7 @@ class UserServiceImplTest {
         void firstAvatar() {
             User user = user(null);
             MockMultipartFile avatar = avatarFile();
-            when(userRepository.findByUuid(user.getUuid())).thenReturn(Optional.of(user));
+            when(userRepository.findLockedByUuid(user.getUuid())).thenReturn(Optional.of(user));
             when(imageUploaderService.uploadImage(avatar)).thenReturn(NEW_AVATAR);
 
             userService.updateDetails(new UserPrincipal(user), details(false), avatar);
@@ -195,7 +209,7 @@ class UserServiceImplTest {
         @DisplayName("При удалении аватара ссылка в базе данных обнуляется, файл удаляется из хранилища")
         void deleteAvatar() {
             User user = user(OLD_AVATAR);
-            when(userRepository.findByUuid(user.getUuid())).thenReturn(Optional.of(user));
+            when(userRepository.findLockedByUuid(user.getUuid())).thenReturn(Optional.of(user));
 
             userService.updateDetails(new UserPrincipal(user), details(true), null);
 
@@ -209,7 +223,7 @@ class UserServiceImplTest {
         void uploadFails() {
             User user = user(OLD_AVATAR);
             MockMultipartFile avatar = avatarFile();
-            when(userRepository.findByUuid(user.getUuid())).thenReturn(Optional.of(user));
+            when(userRepository.findLockedByUuid(user.getUuid())).thenReturn(Optional.of(user));
             when(imageUploaderService.uploadImage(avatar)).thenThrow(new IllegalStateException("Image upload failed"));
 
             assertThatThrownBy(() -> userService.updateDetails(new UserPrincipal(user), details(false), avatar))
@@ -223,7 +237,7 @@ class UserServiceImplTest {
         void oldFileNotDeleted() {
             User user = user(OLD_AVATAR);
             MockMultipartFile avatar = avatarFile();
-            when(userRepository.findByUuid(user.getUuid())).thenReturn(Optional.of(user));
+            when(userRepository.findLockedByUuid(user.getUuid())).thenReturn(Optional.of(user));
             when(imageUploaderService.uploadImage(avatar)).thenReturn(NEW_AVATAR);
             doThrow(new IllegalStateException("Image deletion failed")).when(imageUploaderService).deleteImage(OLD_AVATAR);
 
@@ -241,7 +255,7 @@ class UserServiceImplTest {
         @DisplayName("При неверном пароле аккаунт не удаляется, данные в базе данных не изменяются")
         void wrongPassword() {
             User user = user(OLD_AVATAR);
-            when(userRepository.findByUuid(user.getUuid())).thenReturn(Optional.of(user));
+            when(userRepository.findLockedByUuid(user.getUuid())).thenReturn(Optional.of(user));
             when(passwordEncoder.matches(PASSWORD, "hash")).thenReturn(false);
 
             assertThatThrownBy(() -> userService.delete(new UserPrincipal(user), deleteRequest()))
@@ -257,7 +271,7 @@ class UserServiceImplTest {
         @DisplayName("Адреса и коды удаляются из базы данных, личные данные стираются, аватар удаляется из хранилища последним")
         void success() {
             User user = user(OLD_AVATAR);
-            when(userRepository.findByUuid(user.getUuid())).thenReturn(Optional.of(user));
+            when(userRepository.findLockedByUuid(user.getUuid())).thenReturn(Optional.of(user));
             when(passwordEncoder.matches(PASSWORD, "hash")).thenReturn(true);
             when(passwordEncoder.encode(anyString())).thenReturn("random-hash");
 
@@ -281,7 +295,7 @@ class UserServiceImplTest {
         @DisplayName("Ошибка удаления аватара из хранилища не препятствует удалению аккаунта")
         void fileNotDeleted() {
             User user = user(OLD_AVATAR);
-            when(userRepository.findByUuid(user.getUuid())).thenReturn(Optional.of(user));
+            when(userRepository.findLockedByUuid(user.getUuid())).thenReturn(Optional.of(user));
             when(passwordEncoder.matches(PASSWORD, "hash")).thenReturn(true);
             when(passwordEncoder.encode(anyString())).thenReturn("random-hash");
             doThrow(new IllegalStateException("Image deletion failed")).when(imageUploaderService).deleteImage(OLD_AVATAR);
@@ -296,7 +310,7 @@ class UserServiceImplTest {
         @DisplayName("При отсутствии пользователя из токена в базе данных возвращается ошибка «не найден»")
         void notFound() {
             User user = user(null);
-            when(userRepository.findByUuid(user.getUuid())).thenReturn(Optional.empty());
+            when(userRepository.findLockedByUuid(user.getUuid())).thenReturn(Optional.empty());
 
             assertThatThrownBy(() -> userService.delete(new UserPrincipal(user), deleteRequest()))
                     .isInstanceOf(ResourceNotFoundException.class)
