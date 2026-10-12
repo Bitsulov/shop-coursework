@@ -1,7 +1,12 @@
 package com.example.shop.services.impl;
 
+import com.example.shop.dtos.common.PageResponse;
+import com.example.shop.dtos.product.ProductCardResponse;
+import com.example.shop.dtos.product.ProductFilter;
+import com.example.shop.dtos.product.ProductFiltersResponse;
 import com.example.shop.dtos.product.ProductRequest;
 import com.example.shop.dtos.product.ProductResponse;
+import com.example.shop.dtos.product.ProductSort;
 import com.example.shop.dtos.product.ProductSpecRequest;
 import com.example.shop.exceptions.ResourceNotFoundException;
 import com.example.shop.mappers.ProductMapper;
@@ -21,6 +26,10 @@ import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.mock.web.MockMultipartFile;
 
 import java.math.BigDecimal;
@@ -33,6 +42,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
@@ -59,6 +69,162 @@ class ProductServiceImplTest {
 
     @InjectMocks
     private ProductServiceImpl productService;
+
+    @Nested
+    @DisplayName("Каталог")
+    class Search {
+
+        @Test
+        @DisplayName("Найденные в базе данных товары возвращаются карточками вместе с данными о странице")
+        void found() {
+            Product product = product(null);
+            ProductCardResponse card = new ProductCardResponse();
+            when(productRepository.findAll(any(Specification.class), any(Pageable.class)))
+                    .thenAnswer(invocation -> new PageImpl<>(List.of(product), invocation.getArgument(1), 1));
+            when(productMapper.toCardResponse(product)).thenReturn(card);
+
+            PageResponse<ProductCardResponse> response = productService.search(emptyFilter(), ProductSort.NEW, 0, 24);
+
+            assertThat(response.getContent()).containsExactly(card);
+            assertThat(response.getPage()).isZero();
+            assertThat(response.getSize()).isEqualTo(24);
+            assertThat(response.getTotalElements()).isEqualTo(1);
+        }
+
+        @Test
+        @DisplayName("Сортировка по новизне запрашивает в базе данных сначала самые новые товары")
+        void sortNew() {
+            when(productRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(new PageImpl<>(List.of()));
+
+            productService.search(emptyFilter(), ProductSort.NEW, 0, 24);
+
+            verify(productRepository).findAll(any(Specification.class),
+                    argThat((Pageable pageable) -> pageable.getSort().equals(Sort.by(Sort.Direction.DESC, "createdAt", "id"))));
+        }
+
+        @Test
+        @DisplayName("Сортировка по цене запрашивает в базе данных сначала дешёвые товары")
+        void sortPriceAsc() {
+            when(productRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(new PageImpl<>(List.of()));
+
+            productService.search(emptyFilter(), ProductSort.PRICE_ASC, 0, 24);
+
+            verify(productRepository).findAll(any(Specification.class),
+                    argThat((Pageable pageable) -> pageable.getSort().equals(Sort.by(Sort.Order.asc("price"), Sort.Order.desc("id")))));
+        }
+
+        @Test
+        @DisplayName("При сортировке по скидке порядок задаёт сам запрос к базе данных, а не параметры страницы")
+        void sortDiscount() {
+            when(productRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(new PageImpl<>(List.of()));
+
+            productService.search(emptyFilter(), ProductSort.DISCOUNT, 0, 24);
+
+            verify(productRepository).findAll(any(Specification.class),
+                    argThat((Pageable pageable) -> pageable.getSort().isUnsorted()));
+        }
+
+        @Test
+        @DisplayName("Минимальная цена больше максимальной отклоняется без запроса к базе данных")
+        void minPriceGreaterThanMax() {
+            ProductFilter filter = ProductFilter.builder()
+                    .minPrice(new BigDecimal("60000"))
+                    .maxPrice(new BigDecimal("20000"))
+                    .build();
+
+            assertThatThrownBy(() -> productService.search(filter, ProductSort.NEW, 0, 24))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("Min price cannot be greater than max price");
+            verifyNoInteractions(productRepository);
+        }
+
+        @Test
+        @DisplayName("Размер страницы больше 48 отклоняется без запроса к базе данных")
+        void sizeTooLarge() {
+            assertThatThrownBy(() -> productService.search(emptyFilter(), ProductSort.NEW, 0, 49))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("Page size must be from 1 to 48");
+            verifyNoInteractions(productRepository);
+        }
+
+        @Test
+        @DisplayName("Номер страницы, при котором смещение не помещается в int, отклоняется без запроса к базе данных")
+        void pageTooLarge() {
+            assertThatThrownBy(() -> productService.search(emptyFilter(), ProductSort.NEW, Integer.MAX_VALUE, 48))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("Page is too large");
+            verifyNoInteractions(productRepository);
+        }
+
+        @Test
+        @DisplayName("Цена больше допустимой отклоняется без запроса к базе данных")
+        void priceOutOfRange() {
+            ProductFilter filter = ProductFilter.builder().minPrice(new BigDecimal("10000000000")).build();
+
+            assertThatThrownBy(() -> productService.search(filter, ProductSort.NEW, 0, 24))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("Min price must be from 0 to 9999999999.99 with up to 2 decimals");
+            verifyNoInteractions(productRepository);
+        }
+
+        @Test
+        @DisplayName("Отрицательный номер страницы отклоняется без запроса к базе данных")
+        void negativePage() {
+            assertThatThrownBy(() -> productService.search(emptyFilter(), ProductSort.NEW, -1, 24))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("Page cannot be negative");
+            verifyNoInteractions(productRepository);
+        }
+    }
+
+    @Nested
+    @DisplayName("Варианты фильтров")
+    class GetFilters {
+
+        @Test
+        @DisplayName("Бренды и цвета загружаются из базы данных для выбранной категории")
+        void byCategory() {
+            when(productRepository.findBrandNames(CategoryEnum.PHONES)).thenReturn(List.of("Lumen", "Nord"));
+            when(productRepository.findColors(CategoryEnum.PHONES)).thenReturn(List.of("Чёрный"));
+
+            ProductFiltersResponse response = productService.getFilters(CategoryEnum.PHONES);
+
+            assertThat(response.getBrands()).containsExactly("Lumen", "Nord");
+            assertThat(response.getColors()).containsExactly("Чёрный");
+        }
+    }
+
+    @Nested
+    @DisplayName("Похожие товары")
+    class GetRelated {
+
+        @Test
+        @DisplayName("Товары той же категории без самого товара загружаются из базы данных и возвращаются карточками")
+        void found() {
+            Product product = product(null);
+            Category category = new Category();
+            product.setCategory(category);
+            Product other = product(null);
+            List<ProductCardResponse> cards = List.of(new ProductCardResponse());
+            when(productRepository.findByUuid(product.getUuid())).thenReturn(Optional.of(product));
+            when(productRepository.findTop4ByCategoryAndIdNotOrderByCreatedAtDescIdDesc(category, product.getId()))
+                    .thenReturn(List.of(other));
+            when(productMapper.toCardResponses(List.of(other))).thenReturn(cards);
+
+            assertThat(productService.getRelated(product.getUuid())).isSameAs(cards);
+        }
+
+        @Test
+        @DisplayName("Для несуществующего uuid возвращается ошибка «не найден»")
+        void notFound() {
+            UUID uuid = UUID.randomUUID();
+            when(productRepository.findByUuid(uuid)).thenReturn(Optional.empty());
+
+            assertThatThrownBy(() -> productService.getRelated(uuid))
+                    .isInstanceOf(ResourceNotFoundException.class)
+                    .hasMessage("Product not found");
+        }
+    }
 
     @Nested
     @DisplayName("Получение товара")
@@ -312,7 +478,7 @@ class ProductServiceImplTest {
             assertThatThrownBy(() -> productService.delete(uuid))
                     .isInstanceOf(ResourceNotFoundException.class)
                     .hasMessage("Product not found");
-            verify(productRepository, never()).delete(any());
+            verify(productRepository, never()).delete(any(Product.class));
         }
     }
 
@@ -329,6 +495,10 @@ class ProductServiceImplTest {
         product.setName("Смартфон Nord X1");
         product.setImageUrl(imageUrl);
         return product;
+    }
+
+    private static ProductFilter emptyFilter() {
+        return ProductFilter.builder().build();
     }
 
     private static Brand brand(String name) {
