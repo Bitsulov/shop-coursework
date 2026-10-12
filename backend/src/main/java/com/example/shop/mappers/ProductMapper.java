@@ -1,5 +1,6 @@
 package com.example.shop.mappers;
 
+import com.example.shop.dtos.product.ProductCardResponse;
 import com.example.shop.dtos.product.ProductRequest;
 import com.example.shop.dtos.product.ProductResponse;
 import com.example.shop.dtos.product.ProductSpecResponse;
@@ -11,6 +12,8 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.MappingTarget;
 
+import java.util.List;
+
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface ProductMapper {
 
@@ -19,6 +22,10 @@ public interface ProductMapper {
     ProductResponse toResponse(Product product);
 
     ProductSpecResponse toSpecResponse(ProductSpec spec);
+
+    ProductCardResponse toCardResponse(Product product);
+
+    List<ProductCardResponse> toCardResponses(List<Product> products);
 
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "name")
