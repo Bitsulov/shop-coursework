@@ -19,7 +19,6 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.URI;
 import java.util.Iterator;
 import java.util.UUID;
 
@@ -147,12 +146,11 @@ public class ImageUploaderService {
     }
 
     private String extractObjectNameFromUrl(String imageUrl) {
-        String path = URI.create(imageUrl).getPath();
-        String prefix = "/" + bucketName + "/";
-        if (path == null || !path.startsWith(prefix)) {
+        String prefix = publicUrl + "/" + bucketName + "/";
+        if (imageUrl == null || !imageUrl.startsWith(prefix)) {
             throw new IllegalArgumentException("Incorrect format of image URL");
         }
-        return path.substring(prefix.length());
+        return imageUrl.substring(prefix.length());
     }
 
     private String buildReadOnlyPolicy(String bucket) {
