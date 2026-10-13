@@ -21,6 +21,9 @@ public interface CartProductRepository extends JpaRepository<CartProduct, Long> 
 
     long countByUser(User user);
 
+    @Query("SELECT c.product.id FROM CartProduct c WHERE c.user = :user")
+    List<Long> findProductIdsByUser(@Param("user") User user);
+
     @Modifying
     @Query("DELETE FROM CartProduct c WHERE c.user = :user")
     int deleteAllByUser(@Param("user") User user);
