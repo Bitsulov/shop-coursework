@@ -1,0 +1,86 @@
+@use "shared/styles/media";
+
+.region {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: var(--z-toast);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-end;
+    pointer-events: none;
+
+    @include media.below(media.$md) {
+        right: 16px;
+        bottom: 16px;
+        left: 16px;
+        align-items: stretch;
+    }
+}
+
+.toast {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    width: 360px;
+    max-width: calc(100vw - 32px);
+    padding: 10px 12px;
+    font-size: 14px;
+    line-height: 20px;
+    color: #fff;
+    pointer-events: auto;
+    background: var(--gray-900);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-overlay);
+    animation: toast-in var(--dur-moderate) var(--ease-out-strong) both;
+
+    @include media.below(media.$md) {
+        width: auto;
+        max-width: none;
+    }
+}
+
+.isLeaving {
+    animation: toast-out var(--dur-base) var(--ease-in) both;
+}
+
+.icon {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    background: rgb(255 255 255 / 12%);
+    border-radius: 50%;
+}
+
+.body {
+    flex: 1;
+    min-width: 0;
+}
+
+.title {
+    font-weight: var(--fw-semibold);
+}
+
+.text {
+    overflow: hidden;
+    color: #c7c7cd;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+@keyframes toast-in {
+    from {
+        opacity: 0;
+        transform: translateY(var(--shift-md)) scale(0.98);
+    }
+}
+
+@keyframes toast-out {
+    to {
+        opacity: 0;
+        transform: translateY(var(--shift-sm)) scale(0.98);
+    }
+}
