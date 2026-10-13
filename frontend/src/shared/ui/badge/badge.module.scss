@@ -1,0 +1,33 @@
+.badge {
+    display: inline-flex;
+    gap: 4px;
+    align-items: center;
+    height: 22px;
+    padding: 0 8px;
+    font-size: 12px;
+    font-weight: var(--fw-semibold);
+    line-height: 1;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+    border-radius: var(--radius-xs);
+}
+
+.neutral {
+    color: var(--gray-800);
+    background: var(--gray-100);
+}
+
+.dark {
+    color: #fff;
+    background: var(--gray-900);
+}
+
+.sale {
+    color: #a3150f;
+    background: var(--color-danger-bg);
+}
+
+.success {
+    color: var(--color-success);
+    background: var(--color-success-bg);
+}

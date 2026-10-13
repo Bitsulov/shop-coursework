@@ -1,0 +1,28 @@
+.breadcrumbs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+    padding: 16px 0;
+    font-size: 14px;
+    color: var(--color-text-secondary);
+
+    a {
+        color: var(--color-text-secondary);
+        text-decoration: none;
+
+        &:hover {
+            color: var(--color-text);
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+    }
+
+    > span[aria-hidden="true"] {
+        color: var(--gray-300);
+    }
+
+    [aria-current="page"] {
+        color: var(--color-text);
+    }
+}
