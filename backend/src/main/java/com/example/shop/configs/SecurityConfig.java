@@ -66,6 +66,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/actuator/health").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/auth/user").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/users/addresses/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/cart", "/api/cart/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/**").permitAll()
                         .anyRequest().authenticated()
                 )
