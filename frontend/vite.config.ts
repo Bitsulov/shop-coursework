@@ -6,5 +6,23 @@ export default defineConfig({
     plugins: [reactRouter(), babel({ plugins: ["babel-plugin-react-compiler"] })],
     resolve: {
         tsconfigPaths: true
+    },
+    css: {
+        preprocessorOptions: {
+            scss: {
+                loadPaths: ["src"]
+            }
+        }
+    },
+    server: {
+        proxy: {
+            "/api": {
+                target: "http://localhost:8080",
+                changeOrigin: true,
+                configure: proxy => {
+                    proxy.on("proxyReq", proxyReq => proxyReq.removeHeader("origin"));
+                }
+            }
+        }
     }
 });
