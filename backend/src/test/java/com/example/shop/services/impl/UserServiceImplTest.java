@@ -9,6 +9,7 @@ import com.example.shop.exceptions.ResourceNotFoundException;
 import com.example.shop.mappers.UserMapper;
 import com.example.shop.models.entities.User;
 import com.example.shop.repositories.AddressRepository;
+import com.example.shop.repositories.CartProductRepository;
 import com.example.shop.repositories.UserRepository;
 import com.example.shop.repositories.VerificationCodeRepository;
 import com.example.shop.security.UserPrincipal;
@@ -48,6 +49,8 @@ class UserServiceImplTest {
     private UserRepository userRepository;
     @Mock
     private AddressRepository addressRepository;
+    @Mock
+    private CartProductRepository cartProductRepository;
     @Mock
     private VerificationCodeRepository verificationCodeRepository;
     @Mock
@@ -268,7 +271,7 @@ class UserServiceImplTest {
         }
 
         @Test
-        @DisplayName("Адреса и коды удаляются из базы данных, личные данные стираются, аватар удаляется из хранилища последним")
+        @DisplayName("Адреса, корзина и коды удаляются из базы данных, личные данные стираются, аватар удаляется из хранилища последним")
         void success() {
             User user = user(OLD_AVATAR);
             when(userRepository.findLockedByUuid(user.getUuid())).thenReturn(Optional.of(user));
@@ -284,8 +287,9 @@ class UserServiceImplTest {
             assertThat(user.getPassword()).isEqualTo("random-hash");
             assertThat(user.isActive()).isFalse();
             assertThat(user.getDeletedAt()).isNotNull();
-            InOrder order = inOrder(addressRepository, verificationCodeRepository, userRepository, imageUploaderService);
+            InOrder order = inOrder(addressRepository, cartProductRepository, verificationCodeRepository, userRepository, imageUploaderService);
             order.verify(addressRepository).deleteAllByUser(user);
+            order.verify(cartProductRepository).deleteAllByUser(user);
             order.verify(verificationCodeRepository).deleteAllByUser(user);
             order.verify(userRepository).saveAndFlush(user);
             order.verify(imageUploaderService).deleteImage(OLD_AVATAR);
