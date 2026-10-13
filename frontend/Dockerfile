@@ -3,6 +3,8 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY . .
+ARG VITE_CRYPTO_KEY
+ENV VITE_CRYPTO_KEY=$VITE_CRYPTO_KEY
 RUN npm run build
 RUN npm prune --omit=dev
 

@@ -3,6 +3,7 @@ import { Links, Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
 import { ErrorPage } from "pages/error";
 import { QueryProvider } from "./providers/queryProvider";
 import { StoreProvider } from "./providers/storeProvider";
+import { InitProvider } from "./providers/initProvider";
 import "./global.scss";
 
 export function Layout({ children }: { children: ReactNode }) {
@@ -28,16 +29,14 @@ export default function App() {
     return (
         <StoreProvider>
             <QueryProvider>
-                <Outlet />
+                <InitProvider>
+                    <Outlet />
+                </InitProvider>
             </QueryProvider>
         </StoreProvider>
     );
 }
 
 export function ErrorBoundary() {
-    return (
-        <main>
-            <ErrorPage />
-        </main>
-    );
+    return <ErrorPage standalone />;
 }

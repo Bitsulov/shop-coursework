@@ -1,3 +1,193 @@
+@font-face {
+    font-family: "Golos Text";
+    font-style: normal;
+    font-display: swap;
+    font-weight: 400 900;
+    src: url("../shared/fonts/golos-text-cyrillic-ext-wght-normal.woff2")
+        format("woff2-variations");
+    unicode-range:
+        U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+
+@font-face {
+    font-family: "Golos Text";
+    font-style: normal;
+    font-display: swap;
+    font-weight: 400 900;
+    src: url("../shared/fonts/golos-text-cyrillic-wght-normal.woff2")
+        format("woff2-variations");
+    unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+
+@font-face {
+    font-family: "Golos Text";
+    font-style: normal;
+    font-display: swap;
+    font-weight: 400 900;
+    src: url("../shared/fonts/golos-text-latin-ext-wght-normal.woff2")
+        format("woff2-variations");
+    unicode-range:
+        U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308,
+        U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0,
+        U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+    font-family: "Golos Text";
+    font-style: normal;
+    font-display: swap;
+    font-weight: 400 900;
+    src: url("../shared/fonts/golos-text-latin-wght-normal.woff2")
+        format("woff2-variations");
+    unicode-range:
+        U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304,
+        U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215,
+        U+FEFF, U+FFFD;
+}
+
+:root {
+    --gray-0: #fff;
+    --gray-50: #f5f5f6;
+    --gray-100: #ededef;
+    --gray-200: #e2e2e5;
+    --gray-300: #c7c7cd;
+    --gray-400: #8a8a92;
+    --gray-500: #6b6b73;
+    --gray-600: #5c5c64;
+    --gray-700: #46464d;
+    --gray-800: #2b2b30;
+    --gray-900: #141416;
+    --accent-50: #eef1fe;
+    --accent-500: #2346e8;
+    --accent-600: #1f3fd1;
+    --accent-700: #1a35b5;
+    --color-bg: var(--gray-0);
+    --color-bg-subtle: var(--gray-50);
+    --color-bg-muted: var(--gray-100);
+    --color-text: var(--gray-900);
+    --color-text-secondary: var(--gray-500);
+    --color-text-disabled: #a1a1a8;
+    --color-border: var(--gray-200);
+    --color-border-strong: var(--gray-400);
+    --color-focus: var(--gray-900);
+    --color-accent: var(--accent-500);
+    --color-accent-hover: var(--accent-600);
+    --color-accent-active: var(--accent-700);
+    --color-on-accent: #fff;
+    --color-danger: #c4231b;
+    --color-danger-bg: #fcecea;
+    --color-success: #0f7a3d;
+    --color-success-bg: #e7f4ec;
+    --color-overlay: rgb(20 20 22 / 45%);
+    --font-sans: "Golos Text", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --fw-regular: 400;
+    --fw-medium: 500;
+    --fw-semibold: 600;
+    --fw-bold: 700;
+    --text-xs: 12px;
+    --lh-xs: 16px;
+    --text-sm: 14px;
+    --lh-sm: 20px;
+    --text-md: 16px;
+    --lh-md: 24px;
+    --text-lg: 18px;
+    --lh-lg: 26px;
+    --text-xl: 22px;
+    --lh-xl: 28px;
+    --text-2xl: 28px;
+    --lh-2xl: 34px;
+    --text-3xl: 36px;
+    --lh-3xl: 42px;
+    --text-4xl: 48px;
+    --lh-4xl: 54px;
+    --tracking-tight: -0.02em;
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 20px;
+    --space-6: 24px;
+    --space-8: 32px;
+    --space-10: 40px;
+    --space-12: 48px;
+    --space-16: 64px;
+    --space-20: 80px;
+    --space-24: 96px;
+    --radius-xs: 4px;
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-full: 999px;
+    --shadow-hover: 0 1px 2px rgb(20 20 22 / 4%), 0 8px 24px -8px rgb(20 20 22 / 14%);
+    --shadow-overlay: 0 2px 6px rgb(20 20 22 / 6%), 0 24px 48px -12px rgb(20 20 22 / 24%);
+    --shadow-accent: 0 6px 16px -8px rgb(35 70 232 / 55%);
+    --dur-instant: 100ms;
+    --dur-fast: 150ms;
+    --dur-base: 200ms;
+    --dur-moderate: 250ms;
+    --dur-slow: 320ms;
+    --dur-slower: 400ms;
+    --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
+    --ease-out-strong: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-in: cubic-bezier(0.55, 0, 1, 0.45);
+    --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+    --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --lift: -1px;
+    --press: 0.97;
+    --zoom: 1.04;
+    --shift-xs: 2px;
+    --shift-sm: 6px;
+    --shift-md: 12px;
+    --slide: 1;
+    --bump: 1.35;
+    --container-max: 1440px;
+    --gutter: 16px;
+    --grid-gap: 16px;
+    --header-h: 64px;
+    --header-h-compact: 56px;
+    --z-header: 100;
+    --z-dropdown: 200;
+    --z-drawer: 300;
+    --z-dialog: 400;
+    --z-toast: 500;
+    --z-progress: 600;
+}
+
+@media (width >= 768px) {
+    :root {
+        --gutter: 24px;
+        --grid-gap: 20px;
+        --header-h: 72px;
+        --header-h-compact: 60px;
+    }
+}
+
+@media (width >= 1024px) {
+    :root {
+        --gutter: 40px;
+        --grid-gap: 24px;
+    }
+}
+
+@media (width >= 1280px) {
+    :root {
+        --gutter: 64px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    :root {
+        --lift: 0px;
+        --press: 1;
+        --zoom: 1;
+        --shift-xs: 0px;
+        --shift-sm: 0px;
+        --shift-md: 0px;
+        --slide: 0;
+        --bump: 1;
+    }
+}
+
 *,
 *::before,
 *::after {
@@ -5,6 +195,45 @@
 }
 
 body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
     margin: 0;
-    font-family: system-ui, "Segoe UI", Roboto, sans-serif;
+    font-family: var(--font-sans);
+    font-size: var(--text-md);
+    line-height: var(--lh-md);
+    color: var(--color-text);
+    background: var(--color-bg);
+    -webkit-font-smoothing: antialiased;
+}
+
+:where(h1, h2, h3, h4, p, ul, ol, dl, dd, figure) {
+    margin: 0;
+}
+
+:where(ul, ol) {
+    padding: 0;
+    list-style: none;
+}
+
+:where(button, input, select, textarea) {
+    font: inherit;
+    color: inherit;
+}
+
+:where(img) {
+    display: block;
+    max-width: 100%;
+}
+
+:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+}
+
+.container {
+    width: 100%;
+    max-width: var(--container-max);
+    margin: 0 auto;
+    padding-inline: var(--gutter);
 }

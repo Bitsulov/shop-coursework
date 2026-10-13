@@ -110,6 +110,8 @@ docker compose --env-file ..\..\.env -f compose.yaml -f compose.prod.yaml up -d
 | `LOG_LEVEL_SQL_BIND`                       | Уровень логов параметров SQL-запросов.                  |
 | **Документация API**                       |                                                         |
 | `SWAGGER_ENABLED`                          | Включить Swagger UI по адресу `/swagger-ui.html`        |
+| **Frontend**                               |                                                         |
+| `CRYPTO_KEY`                               | Ключ шифрования токенов в cookie, 32 байта в Base64     |
 | **pgAdmin**                                |                                                         |
 | `PGADMIN_EMAIL`, `PGADMIN_PASSWORD`        | Учётные данные входа в pgAdmin                          |
 
