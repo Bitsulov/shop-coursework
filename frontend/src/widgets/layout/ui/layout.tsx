@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { Header } from "widgets/header";
 import { Footer } from "widgets/footer";
+import { Toast } from "features/toast";
 import styles from "./layout.module.scss";
 
 export function Layout({ children }: { children: ReactNode }) {
@@ -11,6 +12,7 @@ export function Layout({ children }: { children: ReactNode }) {
                 {children}
             </main>
             <Footer />
+            <Toast />
         </>
     );
 }
