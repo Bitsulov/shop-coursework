@@ -2,6 +2,7 @@ package com.example.shop.controllers;
 
 import com.example.shop.dtos.address.AddressRequest;
 import com.example.shop.dtos.address.AddressResponse;
+import com.example.shop.dtos.user.BalanceTopUpRequest;
 import com.example.shop.dtos.user.DeleteAccountRequest;
 import com.example.shop.dtos.user.UserDetailResponse;
 import com.example.shop.dtos.user.UserResponse;
@@ -83,6 +84,29 @@ public class UserController {
             @RequestPart(value = "avatar", required = false) MultipartFile avatar
     ) {
         UserDetailResponse response = userService.updateDetails(principal, details, avatar);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @Operation(
+            summary = "Пополнение баланса",
+            description = "Пополняет баланс текущего пользователя банковской картой. Учебная оплата, деньги не списываются, данные карты не сохраняются. Карта 4000000000000002 всегда отклоняется.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Баланс пополнен"),
+                    @ApiResponse(responseCode = "400", description = "Ошибка валидации или срок действия карты истёк"),
+                    @ApiResponse(responseCode = "401", description = "Требуется аутентификация"),
+                    @ApiResponse(responseCode = "402", description = "Банк отклонил платёж"),
+                    @ApiResponse(responseCode = "404", description = "Пользователь не найден"),
+                    @ApiResponse(responseCode = "409", description = "Достигнут предел баланса"),
+                    @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
+            }
+    )
+    @PostMapping("/balance")
+    public ResponseEntity<UserDetailResponse> topUpBalance(
+            @Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal principal,
+            @Parameter(description = "Сумма и данные карты", required = true)
+            @Valid @RequestBody BalanceTopUpRequest request
+    ) {
+        UserDetailResponse response = userService.topUpBalance(principal, request);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
