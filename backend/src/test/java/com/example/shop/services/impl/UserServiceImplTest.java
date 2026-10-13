@@ -1,10 +1,13 @@
 package com.example.shop.services.impl;
 
+import com.example.shop.dtos.user.BalanceTopUpRequest;
 import com.example.shop.dtos.user.DeleteAccountRequest;
 import com.example.shop.dtos.user.UserDetailResponse;
 import com.example.shop.dtos.user.UserResponse;
 import com.example.shop.dtos.user.UserUpdateDetails;
+import com.example.shop.exceptions.ConflictException;
 import com.example.shop.exceptions.ForbiddenException;
+import com.example.shop.exceptions.PaymentDeclinedException;
 import com.example.shop.exceptions.ResourceNotFoundException;
 import com.example.shop.mappers.UserMapper;
 import com.example.shop.models.entities.User;
@@ -25,6 +28,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.math.BigDecimal;
+import java.time.YearMonth;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -43,6 +50,8 @@ import static org.mockito.Mockito.when;
 class UserServiceImplTest {
 
     private static final String PASSWORD = "StrongPass123";
+    private static final String VALID_CARD = "4276160012345678";
+    private static final String DECLINED_CARD = "4000000000000002";
     private static final String OLD_AVATAR = "http://localhost:9000/shop-files/client_old.jpg";
     private static final String NEW_AVATAR = "http://localhost:9000/shop-files/client_new.jpg";
 
@@ -254,6 +263,117 @@ class UserServiceImplTest {
     }
 
     @Nested
+    @DisplayName("Пополнение баланса")
+    class TopUpBalance {
+
+        @Test
+        @DisplayName("Сумма прибавляется к балансу пользователя в базе данных")
+        void added() {
+            User user = user(null);
+            user.setBalance(new BigDecimal("1000.00"));
+            UserDetailResponse expected = new UserDetailResponse();
+            when(userRepository.findLockedByUuid(user.getUuid())).thenReturn(Optional.of(user));
+            when(userMapper.toDetailResponse(user)).thenReturn(expected);
+
+            UserDetailResponse response = userService.topUpBalance(new UserPrincipal(user), topUp(5000, VALID_CARD, "12/99"));
+
+            assertThat(response).isSameAs(expected);
+            assertThat(user.getBalance()).isEqualByComparingTo("6000.00");
+            assertThat(user.getUpdatedAt()).isNotNull();
+            verify(userRepository).saveAndFlush(user);
+        }
+
+        @Test
+        @DisplayName("Карта, срок которой заканчивается в текущем месяце, принимается")
+        void expiresThisMonth() {
+            User user = user(null);
+            String expiry = YearMonth.now(ZoneOffset.UTC).format(DateTimeFormatter.ofPattern("MM/yy"));
+            when(userRepository.findLockedByUuid(user.getUuid())).thenReturn(Optional.of(user));
+
+            userService.topUpBalance(new UserPrincipal(user), topUp(100, VALID_CARD, expiry));
+
+            assertThat(user.getBalance()).isEqualByComparingTo("100");
+            verify(userRepository).saveAndFlush(user);
+        }
+
+        @Test
+        @DisplayName("Карта, срок которой закончился в прошлом месяце, отклоняется без обращения к базе данных")
+        void expiredCard() {
+            User user = user(null);
+            String expiry = YearMonth.now(ZoneOffset.UTC).minusMonths(1).format(DateTimeFormatter.ofPattern("MM/yy"));
+
+            assertThatThrownBy(() -> userService.topUpBalance(new UserPrincipal(user), topUp(5000, VALID_CARD, expiry)))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("Card has expired");
+            verifyNoInteractions(userRepository);
+        }
+
+        @Test
+        @DisplayName("Платёж по тестовой карте отказа отклоняется банком без обращения к базе данных")
+        void declined() {
+            User user = user(null);
+
+            assertThatThrownBy(() -> userService.topUpBalance(new UserPrincipal(user), topUp(5000, DECLINED_CARD, "12/99")))
+                    .isInstanceOf(PaymentDeclinedException.class)
+                    .hasMessage("Payment declined");
+            verifyNoInteractions(userRepository);
+        }
+
+        @Test
+        @DisplayName("Пополнение ровно до предельного баланса сохраняется в базе данных")
+        void upToLimit() {
+            User user = user(null);
+            user.setBalance(new BigDecimal("9999999899.99"));
+            when(userRepository.findLockedByUuid(user.getUuid())).thenReturn(Optional.of(user));
+
+            userService.topUpBalance(new UserPrincipal(user), topUp(100, VALID_CARD, "12/99"));
+
+            assertThat(user.getBalance()).isEqualByComparingTo("9999999999.99");
+            verify(userRepository).saveAndFlush(user);
+        }
+
+        @Test
+        @DisplayName("Пополнение сверх предельного баланса отклоняется, баланс в базе данных не меняется")
+        void limitReached() {
+            User user = user(null);
+            user.setBalance(new BigDecimal("9999999900.00"));
+            when(userRepository.findLockedByUuid(user.getUuid())).thenReturn(Optional.of(user));
+
+            assertThatThrownBy(() -> userService.topUpBalance(new UserPrincipal(user), topUp(100, VALID_CARD, "12/99")))
+                    .isInstanceOf(ConflictException.class)
+                    .hasMessage("Balance limit reached");
+            assertThat(user.getBalance()).isEqualByComparingTo("9999999900.00");
+            verify(userRepository, never()).saveAndFlush(any());
+        }
+
+        @Test
+        @DisplayName("При отсутствии пользователя из токена в базе данных возвращается ошибка «не найден»")
+        void userNotFound() {
+            User user = user(null);
+            when(userRepository.findLockedByUuid(user.getUuid())).thenReturn(Optional.empty());
+
+            assertThatThrownBy(() -> userService.topUpBalance(new UserPrincipal(user), topUp(5000, VALID_CARD, "12/99")))
+                    .isInstanceOf(ResourceNotFoundException.class)
+                    .hasMessage("User not found");
+            verify(userRepository, never()).saveAndFlush(any());
+        }
+
+        @Test
+        @DisplayName("Для удалённого или неподтверждённого пользователя возвращается ошибка «не найден», баланс не меняется")
+        void inactiveUser() {
+            User user = user(null);
+            user.setActive(false);
+            when(userRepository.findLockedByUuid(user.getUuid())).thenReturn(Optional.of(user));
+
+            assertThatThrownBy(() -> userService.topUpBalance(new UserPrincipal(user), topUp(5000, VALID_CARD, "12/99")))
+                    .isInstanceOf(ResourceNotFoundException.class)
+                    .hasMessage("User not found");
+            assertThat(user.getBalance()).isEqualByComparingTo("0");
+            verify(userRepository, never()).saveAndFlush(any());
+        }
+    }
+
+    @Nested
     @DisplayName("Удаление аккаунта")
     class Delete {
 
@@ -338,6 +458,15 @@ class UserServiceImplTest {
         user.setAvatarUrl(avatarUrl);
         user.setActive(true);
         return user;
+    }
+
+    private static BalanceTopUpRequest topUp(int amount, String cardNumber, String expiry) {
+        BalanceTopUpRequest request = new BalanceTopUpRequest();
+        request.setAmount(amount);
+        request.setCardNumber(cardNumber);
+        request.setExpiry(expiry);
+        request.setCvc("123");
+        return request;
     }
 
     private static UserUpdateDetails details(boolean deleteAvatar) {
