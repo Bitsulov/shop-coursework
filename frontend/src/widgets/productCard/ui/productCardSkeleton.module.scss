@@ -1,0 +1,18 @@
+.skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.media {
+    aspect-ratio: 1;
+    border-radius: var(--radius-md);
+}
+
+.line {
+    height: 14px;
+}
+
+.title {
+    height: 20px;
+}
