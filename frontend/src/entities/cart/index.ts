@@ -1,2 +1,2 @@
 export type { CartResponse, CartProductResponse } from "./api/types";
-export { getCart } from "./api/cartApi";
+export { getCart, setCartProductQuantity, removeCartProduct } from "./api/cartApi";

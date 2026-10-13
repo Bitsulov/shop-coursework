@@ -32,3 +32,8 @@ export interface ProductResponse {
     createdAt: string;
     updatedAt: string;
 }
+
+export interface ProductFiltersResponse {
+    brands: string[];
+    colors: string[];
+}
