@@ -69,7 +69,7 @@
     }
 }
 
-.menuButton {
+.row .menuButton {
     margin-left: -10px;
 
     @include media.from(media.$md) {
