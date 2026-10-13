@@ -1,10 +1,13 @@
 package com.example.shop.services.impl;
 
+import com.example.shop.dtos.user.BalanceTopUpRequest;
 import com.example.shop.dtos.user.DeleteAccountRequest;
 import com.example.shop.dtos.user.UserDetailResponse;
 import com.example.shop.dtos.user.UserResponse;
 import com.example.shop.dtos.user.UserUpdateDetails;
+import com.example.shop.exceptions.ConflictException;
 import com.example.shop.exceptions.ForbiddenException;
+import com.example.shop.exceptions.PaymentDeclinedException;
 import com.example.shop.exceptions.ResourceNotFoundException;
 import com.example.shop.mappers.UserMapper;
 import com.example.shop.models.entities.User;
@@ -22,13 +25,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.YearMonth;
+import java.time.ZoneOffset;
 import java.util.UUID;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
+
+    private static final String DECLINED_CARD = "4000000000000002";
+    private static final BigDecimal MAX_BALANCE = new BigDecimal("9999999999.99");
 
     private final UserRepository userRepository;
     private final AddressRepository addressRepository;
@@ -110,6 +119,45 @@ public class UserServiceImpl implements UserService {
         }
 
         log.info("User updated profile, uuid={}", uuid);
+        return userMapper.toDetailResponse(user);
+    }
+
+    @Override
+    @Transactional
+    public UserDetailResponse topUpBalance(UserPrincipal principal, BalanceTopUpRequest request) {
+        UUID uuid = principal.getUuid();
+
+        int month = Integer.parseInt(request.getExpiry().substring(0, 2));
+        int year = 2000 + Integer.parseInt(request.getExpiry().substring(3));
+        if (YearMonth.of(year, month).isBefore(YearMonth.now(ZoneOffset.UTC))) {
+            log.warn("Balance top-up warn: card has expired, uuid={}", uuid);
+            throw new IllegalArgumentException("Card has expired");
+        }
+        if (DECLINED_CARD.equals(request.getCardNumber())) {
+            log.warn("Balance top-up warn: payment declined by the bank, uuid={}", uuid);
+            throw new PaymentDeclinedException("Payment declined");
+        }
+
+        User user = userRepository.findLockedByUuid(uuid)
+                .orElseThrow(() -> {
+                    log.warn("Balance top-up failed: user not found, uuid={}", uuid);
+                    return new ResourceNotFoundException("User not found");
+                });
+        if (!user.isActive()) {
+            log.warn("Balance top-up failed: user is deleted or not verified, uuid={}", uuid);
+            throw new ResourceNotFoundException("User not found");
+        }
+
+        BigDecimal balance = user.getBalance().add(BigDecimal.valueOf(request.getAmount()));
+        if (balance.compareTo(MAX_BALANCE) > 0) {
+            log.warn("Balance top-up warn: balance limit reached, uuid={}", uuid);
+            throw new ConflictException("Balance limit reached");
+        }
+        user.setBalance(balance);
+        user.setUpdatedAt(Instant.now());
+        userRepository.saveAndFlush(user);
+
+        log.info("User topped up balance, amount={}, uuid={}", request.getAmount(), uuid);
         return userMapper.toDetailResponse(user);
     }
 
