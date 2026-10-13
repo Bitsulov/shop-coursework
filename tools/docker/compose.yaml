@@ -72,7 +72,11 @@ services:
   frontend:
     build:
       context: ../../frontend
+      args:
+        VITE_CRYPTO_KEY: ${VITE_CRYPTO_KEY}
     container_name: shop_frontend
+    environment:
+      API_URL: http://backend:8080
 
 volumes:
   postgres-data:
