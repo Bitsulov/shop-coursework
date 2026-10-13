@@ -1,5 +1,6 @@
 package com.example.shop.services;
 
+import com.example.shop.dtos.user.BalanceTopUpRequest;
 import com.example.shop.dtos.user.DeleteAccountRequest;
 import com.example.shop.dtos.user.UserDetailResponse;
 import com.example.shop.dtos.user.UserResponse;
@@ -16,6 +17,8 @@ public interface UserService {
     UserDetailResponse updateDetails(UserPrincipal principal, UserUpdateDetails details, MultipartFile avatar);
 
     UserResponse getByUuid(UUID uuid);
+
+    UserDetailResponse topUpBalance(UserPrincipal principal, BalanceTopUpRequest request);
 
     void delete(UserPrincipal principal, DeleteAccountRequest request);
 }

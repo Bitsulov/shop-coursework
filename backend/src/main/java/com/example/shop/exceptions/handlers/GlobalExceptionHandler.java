@@ -3,6 +3,7 @@ package com.example.shop.exceptions.handlers;
 import com.example.shop.exceptions.ConflictException;
 import com.example.shop.exceptions.ForbiddenException;
 import com.example.shop.exceptions.GoneException;
+import com.example.shop.exceptions.PaymentDeclinedException;
 import com.example.shop.exceptions.ResourceNotFoundException;
 import com.example.shop.exceptions.UnauthorizedException;
 import com.example.shop.exceptions.models.AppError;
@@ -44,6 +45,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ConflictException.class)
     public ResponseEntity<AppError> handleConflict(ConflictException ex, HttpServletRequest request) {
         return buildError(HttpStatus.CONFLICT, ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(PaymentDeclinedException.class)
+    public ResponseEntity<AppError> handlePaymentDeclined(PaymentDeclinedException ex, HttpServletRequest request) {
+        return buildError(HttpStatus.PAYMENT_REQUIRED, ex.getMessage(), request);
     }
 
     @ExceptionHandler(ForbiddenException.class)
