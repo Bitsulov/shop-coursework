@@ -1,0 +1,22 @@
+$sm: 480px;
+$md: 768px;
+$lg: 1024px;
+$xl: 1280px;
+
+@mixin from($width) {
+    @media (width >= $width) {
+        @content;
+    }
+}
+
+@mixin below($width) {
+    @media (width < $width) {
+        @content;
+    }
+}
+
+@mixin no-hover {
+    @media (hover: none) {
+        @content;
+    }
+}
