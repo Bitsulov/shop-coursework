@@ -10,6 +10,7 @@ import com.example.shop.mappers.UserMapper;
 import com.example.shop.models.entities.User;
 import com.example.shop.repositories.AddressRepository;
 import com.example.shop.repositories.CartProductRepository;
+import com.example.shop.repositories.OrderRepository;
 import com.example.shop.repositories.UserRepository;
 import com.example.shop.repositories.VerificationCodeRepository;
 import com.example.shop.security.UserPrincipal;
@@ -32,6 +33,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final AddressRepository addressRepository;
     private final CartProductRepository cartProductRepository;
+    private final OrderRepository orderRepository;
     private final VerificationCodeRepository verificationCodeRepository;
     private final UserMapper userMapper;
     private final ImageUploaderService imageUploaderService;
@@ -128,6 +130,7 @@ public class UserServiceImpl implements UserService {
 
         addressRepository.deleteAllByUser(user);
         cartProductRepository.deleteAllByUser(user);
+        orderRepository.deleteAllByUserId(user.getId());
         verificationCodeRepository.deleteAllByUser(user);
 
         String avatarUrl = user.getAvatarUrl();
