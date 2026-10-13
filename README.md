@@ -111,7 +111,7 @@ docker compose --env-file ..\..\.env -f compose.yaml -f compose.prod.yaml up -d
 | **Документация API**                       |                                                         |
 | `SWAGGER_ENABLED`                          | Включить Swagger UI по адресу `/swagger-ui.html`        |
 | **Frontend**                               |                                                         |
-| `VITE_CRYPTO_KEY`                          | Ключ шифрования токенов в cookie, 32 байта в Base64     |
+| `CRYPTO_KEY`                               | Ключ шифрования токенов в cookie, 32 байта в Base64     |
 | **pgAdmin**                                |                                                         |
 | `PGADMIN_EMAIL`, `PGADMIN_PASSWORD`        | Учётные данные входа в pgAdmin                          |
 
