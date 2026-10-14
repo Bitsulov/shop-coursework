@@ -127,11 +127,11 @@ export function RegisterForm() {
                     Почта {email} подтверждена, вы уже вошли в аккаунт.
                 </p>
                 <div className={styles.doneActions}>
-                    <ButtonLink to="/catalog" size="lg" block>
-                        Перейти в каталог
+                    <ButtonLink to="/profile" size="lg" block>
+                        Перейти в профиль
                     </ButtonLink>
-                    <ButtonLink to="/" variant="text" block>
-                        На главную
+                    <ButtonLink to="/catalog" variant="text" block>
+                        Продолжить покупки
                     </ButtonLink>
                 </div>
             </div>
