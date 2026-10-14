@@ -3,6 +3,6 @@ export const supportPhone = {
     href: "88000000000"
 };
 
-export const supportEmail = "help@shop.example";
+export const supportEmail = "test.dev0@mail.ru";
 
 export const workingHours = "Ежедневно с 9:00 до 21:00";

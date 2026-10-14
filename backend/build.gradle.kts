@@ -44,6 +44,8 @@ dependencies {
 	implementation("net.coobird:thumbnailator:0.4.21")
 	// Отправка писем (уведомления о заказах)
 	implementation("org.springframework.boot:spring-boot-starter-mail")
+	// Шаблонизатор для HTML писем
+	implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
 	// Обмен сообщениями по протоколу AMQP (RabbitMQ)
 	implementation("org.springframework.boot:spring-boot-starter-amqp")
 	// Проверка состояния приложения
