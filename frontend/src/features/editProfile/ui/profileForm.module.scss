@@ -1,0 +1,23 @@
+@use "shared/styles/media";
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+
+    @include media.from(media.$md) {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}

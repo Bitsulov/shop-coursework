@@ -6,6 +6,7 @@ import type {
     SendCodeRequest,
     SignInRequest,
     SignUpRequest,
+    UpdateUserRequest,
     UserDetailResponse,
     VerifyRequest
 } from "./types";
@@ -33,6 +34,24 @@ export async function login(data: SignInRequest) {
 export async function topUpBalance(data: BalanceTopUpRequest) {
     const response = await api.post<UserDetailResponse>("/users/balance", data);
     return response.data;
+}
+
+export async function updateUser({ details, avatar }: UpdateUserRequest) {
+    const formData = new FormData();
+    formData.append(
+        "details",
+        new Blob([JSON.stringify(details)], { type: "application/json" })
+    );
+    if (avatar) {
+        formData.append("avatar", avatar);
+    }
+
+    const response = await api.put<UserDetailResponse>("/users", formData);
+    return response.data;
+}
+
+export async function deleteAccount(password: string) {
+    await api.delete("/users", { data: { password } });
 }
 
 export async function getPrincipalUser(client: AxiosInstance = api) {
