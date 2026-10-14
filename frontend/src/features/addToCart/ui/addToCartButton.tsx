@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
@@ -22,6 +22,7 @@ export function AddToCartButton({
     className
 }: AddToCartButtonProps) {
     const navigate = useNavigate();
+    const location = useLocation();
     const dispatch = useDispatch();
     const queryClient = useQueryClient();
     const isAuthenticated = useSelector(selectIsAuthenticated);
@@ -69,7 +70,9 @@ export function AddToCartButton({
 
     const onClick = () => {
         if (!isAuthenticated) {
-            navigate("/login");
+            navigate(
+                `/login?redirect=${encodeURIComponent(location.pathname + location.search)}`
+            );
             return;
         }
         const quantity =

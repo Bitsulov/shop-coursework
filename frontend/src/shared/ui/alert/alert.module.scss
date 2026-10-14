@@ -1,0 +1,23 @@
+.alert {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    padding: 12px 14px;
+    font-size: 14px;
+    line-height: 20px;
+    border-radius: var(--radius-sm);
+
+    > span:first-child {
+        margin-top: 1px;
+    }
+}
+
+.error {
+    color: #8e140e;
+    background: var(--color-danger-bg);
+}
+
+.info {
+    color: var(--gray-800);
+    background: var(--gray-50);
+}

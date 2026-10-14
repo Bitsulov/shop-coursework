@@ -1,0 +1,177 @@
+@use "shared/styles/typography";
+
+.card {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    width: 100%;
+    max-width: 420px;
+    animation: step-in var(--dur-slow) var(--ease-out) both;
+}
+
+.heading {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.step {
+    @include typography.sm;
+
+    color: var(--color-text-secondary);
+}
+
+.title {
+    @include typography.h1;
+}
+
+.muted {
+    color: var(--color-text-secondary);
+}
+
+.email {
+    font-weight: var(--fw-medium);
+    color: var(--color-text);
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.rules {
+    @include typography.sm;
+
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 0;
+    padding: 8px 0 0;
+    color: var(--color-text-secondary);
+    list-style: none;
+
+    li {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        transition: color var(--dur-base) var(--ease-out);
+    }
+}
+
+.ruleIcon {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 16px;
+    height: 16px;
+    color: transparent;
+    border: 1.5px solid var(--gray-400);
+    border-radius: 50%;
+    transition:
+        background-color var(--dur-base) var(--ease-out),
+        border-color var(--dur-base) var(--ease-out),
+        color var(--dur-base) var(--ease-out);
+}
+
+.isMet {
+    color: var(--color-success);
+
+    .ruleIcon {
+        color: #fff;
+        background: var(--color-success);
+        border-color: var(--color-success);
+    }
+}
+
+.submit {
+    margin-top: 8px;
+}
+
+.divider {
+    height: 1px;
+    background: var(--color-border);
+}
+
+.switch {
+    text-align: center;
+}
+
+.link {
+    font-weight: var(--fw-medium);
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-color: var(--gray-300);
+    text-underline-offset: 3px;
+
+    &:hover {
+        text-decoration-color: currentcolor;
+    }
+}
+
+.back {
+    align-self: flex-start;
+    margin-left: -8px;
+}
+
+.codeBlock {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.resend {
+    display: flex;
+    align-items: center;
+    min-height: 36px;
+    font-size: 15px;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text-secondary);
+
+    button {
+        margin-left: -8px;
+    }
+}
+
+.done {
+    align-items: center;
+    padding-top: 24px;
+    text-align: center;
+
+    .muted {
+        max-width: 360px;
+    }
+}
+
+.successMark {
+    display: grid;
+    place-items: center;
+    width: 72px;
+    height: 72px;
+    color: var(--color-success);
+    background: var(--color-success-bg);
+    border-radius: 50%;
+    animation: pop-in var(--dur-slower) var(--ease-spring) both;
+}
+
+.doneActions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    margin-top: 8px;
+}
+
+@keyframes step-in {
+    from {
+        opacity: 0;
+        transform: translateX(var(--shift-md));
+    }
+}
+
+@keyframes pop-in {
+    from {
+        opacity: 0;
+        transform: scale(0.6);
+    }
+}

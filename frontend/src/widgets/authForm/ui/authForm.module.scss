@@ -1,0 +1,54 @@
+@use "shared/styles/typography";
+
+.card {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    width: 100%;
+    max-width: 420px;
+}
+
+.heading {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.title {
+    @include typography.h1;
+}
+
+.muted {
+    color: var(--color-text-secondary);
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.submit {
+    margin-top: 8px;
+}
+
+.divider {
+    height: 1px;
+    background: var(--color-border);
+}
+
+.switch {
+    text-align: center;
+}
+
+.link {
+    font-weight: var(--fw-medium);
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-color: var(--gray-300);
+    text-underline-offset: 3px;
+
+    &:hover {
+        text-decoration-color: currentcolor;
+    }
+}

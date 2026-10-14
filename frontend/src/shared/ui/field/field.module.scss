@@ -1,0 +1,105 @@
+@use "shared/styles/typography";
+
+.field {
+    display: flex;
+    flex-direction: column;
+}
+
+.control {
+    position: relative;
+}
+
+.input {
+    width: 100%;
+    height: 56px;
+    padding: 22px 14px 6px;
+    font-size: 16px;
+    line-height: 24px;
+    color: var(--color-text);
+    outline: none;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-sm);
+    transition:
+        border-color var(--dur-fast) var(--ease-out),
+        box-shadow var(--dur-fast) var(--ease-out);
+
+    &:hover {
+        border-color: var(--gray-700);
+    }
+
+    &:focus {
+        border-color: var(--gray-900);
+        box-shadow: inset 0 0 0 1px var(--gray-900);
+    }
+
+    &:disabled {
+        color: var(--color-text-disabled);
+        cursor: not-allowed;
+        background: var(--gray-50);
+        border-color: var(--gray-200);
+    }
+
+    .isInvalid & {
+        border-color: var(--color-danger);
+        box-shadow: inset 0 0 0 1px var(--color-danger);
+    }
+}
+
+.withButton {
+    padding-right: 52px;
+}
+
+.label {
+    position: absolute;
+    top: 16px;
+    left: 15px;
+    font-size: 16px;
+    line-height: 24px;
+    color: var(--color-text-secondary);
+    pointer-events: none;
+    transform-origin: 0 0;
+    transition:
+        transform var(--dur-fast) var(--ease-out),
+        color var(--dur-fast) var(--ease-out);
+
+    .input:focus + &,
+    .input:not(:placeholder-shown) + & {
+        transform: translateY(-9px) scale(0.75);
+    }
+
+    .input:focus + & {
+        color: var(--color-text);
+    }
+
+    .isInvalid & {
+        color: var(--color-danger);
+    }
+}
+
+.toggle {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+}
+
+.error {
+    @include typography.sm;
+
+    display: flex;
+    gap: 6px;
+    align-items: flex-start;
+    padding-top: 6px;
+    color: var(--color-danger);
+
+    span {
+        margin-top: 2px;
+    }
+}
+
+.hint {
+    @include typography.sm;
+
+    padding-top: 6px;
+    color: var(--color-text-secondary);
+}

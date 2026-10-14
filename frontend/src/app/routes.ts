@@ -5,6 +5,8 @@ export default [
         index("routes/home.tsx"),
         route("catalog", "routes/catalog.tsx"),
         route("product/:uuid", "routes/product.tsx"),
+        route("login", "routes/login.tsx"),
+        route("register", "routes/register.tsx"),
         route("*", "routes/not-found.tsx")
     ])
 ] satisfies RouteConfig;
