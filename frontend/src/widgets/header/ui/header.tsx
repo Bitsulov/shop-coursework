@@ -18,6 +18,7 @@ import cartIcon from "shared/icons/cart.svg";
 import userIcon from "shared/icons/user.svg";
 import chevronRightIcon from "shared/icons/chevronRight.svg";
 import { supportPhone, workingHours } from "shared/config/contacts";
+import { CartDrawer } from "./cartDrawer";
 import styles from "./header.module.scss";
 
 export function Header() {
@@ -25,6 +26,7 @@ export function Header() {
     const navigation = useNavigation();
     const [isCompact, setIsCompact] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isCartOpen, setIsCartOpen] = useState(false);
 
     const { data: cart } = useQuery({
         queryKey: ["cart"],
@@ -83,18 +85,30 @@ export function Header() {
                         Каталог
                     </ButtonLink>
                     <div className={styles.actions}>
-                        <Link
-                            className={styles.iconLink}
-                            to="/cart"
-                            aria-label={`Корзина, товаров: ${cartCount}`}
-                        >
-                            <Icon src={cartIcon} size={24} />
-                            {cartCount > 0 && (
-                                <span className={styles.count} aria-hidden="true">
-                                    {cartCount}
-                                </span>
-                            )}
-                        </Link>
+                        {user.isAuthenticated ? (
+                            <button
+                                type="button"
+                                className={styles.iconLink}
+                                aria-label={`Корзина, товаров: ${cartCount}`}
+                                aria-expanded={isCartOpen}
+                                onClick={() => setIsCartOpen(true)}
+                            >
+                                <Icon src={cartIcon} size={24} />
+                                {cartCount > 0 && (
+                                    <span className={styles.count} aria-hidden="true">
+                                        {cartCount}
+                                    </span>
+                                )}
+                            </button>
+                        ) : (
+                            <Link
+                                className={styles.iconLink}
+                                to="/cart"
+                                aria-label="Корзина"
+                            >
+                                <Icon src={cartIcon} size={24} />
+                            </Link>
+                        )}
                         {user.isAuthenticated ? (
                             <Link
                                 className={styles.user}
@@ -152,6 +166,14 @@ export function Header() {
                     ))}
                 </nav>
             </Drawer>
+
+            {user.isAuthenticated && (
+                <CartDrawer
+                    open={isCartOpen}
+                    onClose={() => setIsCartOpen(false)}
+                    cart={cart}
+                />
+            )}
         </header>
     );
 }
