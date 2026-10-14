@@ -5,7 +5,9 @@ export type {
     SendCodeRequest,
     SignInRequest,
     SignUpRequest,
+    UpdateUserRequest,
     UserDetailResponse,
+    UserUpdateDetails,
     VerifyRequest
 } from "./api/types";
 export {
@@ -21,5 +23,7 @@ export {
     verify,
     login,
     topUpBalance,
+    updateUser,
+    deleteAccount,
     getPrincipalUser
 } from "./api/userApi";

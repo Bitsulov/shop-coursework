@@ -36,6 +36,17 @@ export interface SignInRequest {
     password: string;
 }
 
+export interface UserUpdateDetails {
+    name: string;
+    phone?: string;
+    deleteAvatar: boolean;
+}
+
+export interface UpdateUserRequest {
+    details: UserUpdateDetails;
+    avatar?: File;
+}
+
 export interface BalanceTopUpRequest {
     amount: number;
     cardNumber: string;
