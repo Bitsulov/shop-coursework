@@ -1,6 +1,7 @@
 export type { PrincipalUserState, Role } from "./model/types";
 export type {
     AuthResponse,
+    BalanceTopUpRequest,
     SendCodeRequest,
     SignInRequest,
     SignUpRequest,
@@ -14,4 +15,11 @@ export {
     selectUser,
     selectIsAuthenticated
 } from "./model/userSlice";
-export { register, sendCode, verify, login, getPrincipalUser } from "./api/userApi";
+export {
+    register,
+    sendCode,
+    verify,
+    login,
+    topUpBalance,
+    getPrincipalUser
+} from "./api/userApi";

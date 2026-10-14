@@ -1,0 +1,48 @@
+.stepper {
+    display: inline-flex;
+    align-items: center;
+    height: 40px;
+    background: var(--color-bg);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-sm);
+    transition: border-color var(--dur-fast) var(--ease-out);
+
+    &:hover {
+        border-color: var(--gray-700);
+    }
+
+    button {
+        display: grid;
+        place-items: center;
+        width: 40px;
+        height: 38px;
+        color: var(--gray-900);
+        cursor: pointer;
+        background: transparent;
+        border: 0;
+        border-radius: var(--radius-sm);
+        transition:
+            background-color var(--dur-fast) var(--ease-out),
+            transform var(--dur-instant) var(--ease-out);
+
+        &:hover:not(:disabled) {
+            background: var(--gray-50);
+        }
+
+        &:active:not(:disabled) {
+            transform: scale(0.88);
+        }
+
+        &:disabled {
+            color: var(--gray-300);
+            cursor: not-allowed;
+        }
+    }
+}
+
+.value {
+    width: 36px;
+    font-weight: var(--fw-semibold);
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+}

@@ -2,6 +2,7 @@ import type { AxiosInstance } from "axios";
 import { api } from "shared/api/instance";
 import type {
     AuthResponse,
+    BalanceTopUpRequest,
     SendCodeRequest,
     SignInRequest,
     SignUpRequest,
@@ -26,6 +27,11 @@ export async function verify(data: VerifyRequest) {
 
 export async function login(data: SignInRequest) {
     const response = await api.post<AuthResponse>("/auth/login", data);
+    return response.data;
+}
+
+export async function topUpBalance(data: BalanceTopUpRequest) {
+    const response = await api.post<UserDetailResponse>("/users/balance", data);
     return response.data;
 }
 

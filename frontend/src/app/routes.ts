@@ -7,6 +7,8 @@ export default [
         route("product/:uuid", "routes/product.tsx"),
         route("login", "routes/login.tsx"),
         route("register", "routes/register.tsx"),
+        route("cart", "routes/cart.tsx"),
+        route("checkout", "routes/checkout.tsx"),
         route("*", "routes/not-found.tsx")
     ])
 ] satisfies RouteConfig;

@@ -36,6 +36,13 @@ export interface SignInRequest {
     password: string;
 }
 
+export interface BalanceTopUpRequest {
+    amount: number;
+    cardNumber: string;
+    expiry: string;
+    cvc: string;
+}
+
 export interface AuthResponse {
     uuid: string;
     accessToken: string;

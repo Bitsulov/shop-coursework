@@ -1,0 +1,94 @@
+@use "shared/styles/typography";
+
+.title {
+    @include typography.h4;
+}
+
+.titleCount {
+    font-weight: var(--fw-regular);
+    color: var(--color-text-secondary);
+}
+
+.item {
+    display: grid;
+    grid-template-columns: 64px minmax(0, 1fr) auto;
+    gap: 12px;
+    align-items: center;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.image {
+    display: grid;
+    place-items: center;
+    width: 64px;
+    height: 64px;
+    padding: 4px;
+    color: var(--gray-300);
+    object-fit: contain;
+    background: var(--gray-50);
+    border-radius: var(--radius-sm);
+}
+
+.info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.name {
+    font-size: 14px;
+    font-weight: var(--fw-medium);
+    line-height: 19px;
+    color: var(--color-text);
+    text-decoration: none;
+
+    &:hover {
+        text-decoration: underline;
+        text-underline-offset: 3px;
+    }
+}
+
+.meta {
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text-secondary);
+}
+
+.total {
+    display: flex;
+    justify-content: space-between;
+    font-size: var(--text-lg);
+    font-weight: var(--fw-semibold);
+    font-variant-numeric: tabular-nums;
+}
+
+.empty {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+    padding: 48px 8px;
+    text-align: center;
+
+    p {
+        @include typography.sm;
+
+        color: var(--color-text-secondary);
+    }
+}
+
+.emptyIcon {
+    display: grid;
+    place-items: center;
+    width: 72px;
+    height: 72px;
+    color: var(--gray-700);
+    background: var(--gray-50);
+    border-radius: 50%;
+}
+
+.emptyTitle {
+    @include typography.h4;
+}

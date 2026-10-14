@@ -116,7 +116,11 @@
     place-items: center;
     width: 44px;
     height: 44px;
+    padding: 0;
     color: var(--gray-700);
+    cursor: pointer;
+    background: transparent;
+    border: 0;
     border-radius: var(--radius-sm);
     transition:
         color var(--dur-fast) var(--ease-out),
