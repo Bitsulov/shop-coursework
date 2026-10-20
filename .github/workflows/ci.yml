@@ -28,12 +28,12 @@ jobs:
 
       - name: Create .env
         run: |
-          cp .github/ci.env .env
+          cp .github/ci.env .env.dev
           cp .github/ci.env backend/.env
 
       - name: Start infrastructure
         working-directory: tools/docker
-        run: docker compose --env-file ../../.env up -d --wait postgres rabbitmq rustfs mailpit
+        run: docker compose --env-file ../../.env.dev up -d --wait postgres rabbitmq rustfs mailpit
 
       - name: Build and test backend
         working-directory: backend
@@ -56,12 +56,12 @@ jobs:
 
       - name: Start application
         working-directory: tools/docker
-        run: docker compose --env-file ../../.env up -d --build --wait backend frontend nginx
+        run: docker compose --env-file ../../.env.dev up -d --build --wait backend frontend nginx
 
       - name: Show container logs
         if: failure()
         working-directory: tools/docker
-        run: docker compose --env-file ../../.env logs
+        run: docker compose --env-file ../../.env.dev logs
 
   prod:
     runs-on: ubuntu-latest
